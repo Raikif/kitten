@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐱💣 Host - Exploding Kittens</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="host-container">
+        <!-- Lobby Screen -->
+        <div id="lobby-screen" class="screen">
+            <div class="lobby-header">
+                <h1>🐱💣 Exploding Kittens</h1>
+                <div class="room-info">
+                    <div class="room-code-display">
+                        <span>Kode Room:</span>
+                        <h2 id="room-code">----</h2>
+                    </div>
+                    <div id="qr-code"></div>
+                </div>
+            </div>
+            
+            <div class="players-lobby">
+                <h3>👥 Pemain (<span id="player-count">0</span>/8)</h3>
+                <div id="players-list" class="players-grid"></div>
+            </div>
+            
+            <div class="lobby-actions">
+                <button id="start-game-btn" class="btn btn-primary btn-large" disabled>
+                    🚀 Mulai Game (Min. 2 Pemain)
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen hidden">
+            <div class="game-header">
+                <div class="deck-info">
+                    <div class="deck-pile" id="deck-pile">
+                        <span class="deck-count" id="deck-count">0</span>
+                        <span>📚</span>
+                    </div>
+                    <div class="discard-pile" id="discard-pile">
+                        <span>🗑️ Discard</span>
+                        <div id="last-played-card"></div>
+                    </div>
+                </div>
+                
+                <div class="turn-indicator">
+                    <h2>Giliran: <span id="current-player-name">-</span></h2>
+                    <div id="turn-timer" class="timer">60</div>
+                </div>
+                
+                <div class="audio-controls">
+                    <button id="audio-toggle" class="btn btn-icon" title="Mute/Unmute Audio">
+                        🔊
+                    </button>
+                </div>
+            </div>
+            
+            <div class="game-players" id="game-players"></div>
+            
+            <div class="game-log">
+                <h4>📜 Log Permainan</h4>
+                <div id="game-log-content"></div>
+            </div>
+
+            <!-- Action Modal -->
+            <div id="action-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h3 id="modal-title">Aksi</h3>
+                    <div id="modal-body"></div>
+                    <div id="modal-actions"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameover-screen" class="screen hidden">
+            <div class="gameover-content">
+                <h1>🏆 GAME OVER!</h1>
+                <div id="winner-display"></div>
+                <button id="play-again-btn" class="btn btn-primary btn-large">
+                    🔄 Main Lagi
+                </button>
+                <button id="back-to-lobby-btn" class="btn btn-secondary">
+                    🏠 Kembali ke Lobby
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/cards.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/host.js"></script>
+    <script>
+        if (typeof firebase !== 'undefined') {
+            initFirebase();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Player - Exploding Kittens</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+    <div class="player-container">
+        <!-- Join Screen -->
+        <div id="join-screen" class="screen">
+            <h1>🐱💣 Gabung Room</h1>
+            
+            <div class="join-tabs">
+                <button class="tab-btn active" data-tab="code">📝 Kode</button>
+                <button class="tab-btn" data-tab="qr">📷 Scan QR</button>
+            </div>
+            
+            <div id="code-tab" class="tab-content active">
+                <input type="text" id="room-code-input" placeholder="Masukkan Kode Room" maxlength="6">
+                <input type="text" id="player-name-input" placeholder="Nama Kamu" maxlength="15">
+                <button id="join-btn" class="btn btn-primary btn-large">
+                    🚀 Gabung
+                </button>
+            </div>
+            
+            <div id="qr-tab" class="tab-content hidden">
+                <div id="qr-reader"></div>
+                <input type="text" id="player-name-qr" placeholder="Nama Kamu" maxlength="15">
+            </div>
+            
+            <div id="join-error" class="error-message hidden"></div>
+        </div>
+
+        <!-- Waiting Screen -->
+        <div id="waiting-screen" class="screen hidden">
+            <div class="waiting-content">
+                <h2>✅ Bergabung!</h2>
+                <p>Room: <strong id="joined-room-code"></strong></p>
+                <p>Nama: <strong id="joined-player-name"></strong></p>
+                <div class="loader"></div>
+                <p>Menunggu host memulai game...</p>
+                <div id="waiting-players-list"></div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="player-game-screen" class="screen hidden">
+            <div class="player-game-header">
+                <div class="player-status">
+                    <span id="player-status-text">Menunggu giliran...</span>
+                </div>
+                <div class="game-info-bar">
+                    <span>📚 Deck: <span id="p-deck-count">0</span></span>
+                    <span>👥 Sisa: <span id="p-players-alive">0</span></span>
+                </div>
+            </div>
+
+            <div class="my-turn-indicator hidden" id="my-turn-indicator">
+                <h2>🎯 GILIRAN KAMU!</h2>
+            </div>
+
+            <div class="player-hand-container">
+                <div class="hand-controls">
+                    <h3>🃏 Kartu Kamu</h3>
+                    <button id="sort-cards-btn">🔀 Urutkan</button>
+                </div>
+                <div class="player-hand" id="player-hand">
+                    <!-- Cards will be rendered here -->
+                </div>
+            </div>
+
+            <div class="player-actions">
+                <div id="draw-card-zone" class="draw-card-zone disabled">
+                    <div class="draw-card-back">
+                        <img src="assets/card-back.webp" alt="Draw Card" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="card-back-fallback" style="display: none;">🎴</div>
+                    </div>
+                    <p class="draw-hint">📥 Klik untuk ambil kartu</p>
+                </div>
+                <button id="nope-btn" class="btn btn-danger hidden">
+                    🚫 NOPE!
+                </button>
+                <button id="player-audio-toggle" class="btn btn-icon" title="Mute/Unmute Audio">
+                    🔊
+                </button>
+            </div>
+
+            <!-- Card Selection Modal -->
+            <div id="card-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h3 id="card-modal-title">Pilih Kartu</h3>
+                    <div id="card-modal-body"></div>
+                    <div id="card-modal-actions">
+                        <button class="btn btn-secondary" id="cancel-card-btn">Batal</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Target Selection Modal -->
+            <div id="target-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h3>Pilih Target</h3>
+                    <div id="target-list"></div>
+                    <button class="btn btn-secondary" id="cancel-target-btn">Batal</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exploded Screen -->
+        <div id="exploded-screen" class="screen hidden">
+            <div class="exploded-content">
+                <h1>💥 BOOM!</h1>
+                <p>Kamu meledak!</p>
+                <div class="explosion-animation">🐱💣💥</div>
+                <p>Menonton sisa permainan...</p>
+            </div>
+        </div>
+
+        <!-- Winner Screen -->
+        <div id="player-winner-screen" class="screen hidden">
+            <div class="winner-content">
+                <h1 id="player-result-title">🏆</h1>
+                <p id="player-result-text"></p>
+                <button id="player-play-again-btn" class="btn btn-primary">
+                    🔄 Main Lagi
+                </button>
+            </div>
+        </div>
+
+        <!-- Cara Main Dropdown -->
+        <div class="how-to-play-container">
+            <details class="how-to-play">
+                <summary>📖 Cara Main</summary>
+                <div class="how-to-play-content">
+                    <h4>🎯 Tujuan</h4>
+                    <p>Jangan sampai mengambil kartu <strong>Exploding Kitten</strong> 💣! Pemain terakhir yang survive adalah pemenangnya!</p>
+                    
+                    <h4>🎮 Giliran Bermain</h4>
+                    <ol>
+                        <li><strong>Mainkan kartu</strong> (opsional) - boleh mainkan kartu aksi sebanyak yang kamu mau</li>
+                        <li><strong>Ambil kartu</strong> dari deck (WAJIB untuk mengakhiri giliran)</li>
+                        <li>Jika ambil 💣 Exploding Kitten → gunakan 🛡️ Defuse atau kamu meledak!</li>
+                    </ol>
+                    
+                    <h4>🃏 Jenis Kartu</h4>
+                    <div class="card-list">
+                        <div class="card-info">
+                            <span class="card-emoji">🛡️</span>
+                            <div>
+                                <strong>Defuse</strong>
+                                <p>Jinakkan bom & taruh kembali di deck</p>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-emoji">⚔️</span>
+                            <div>
+                                <strong>Attack</strong>
+                                <p>Skip giliran, pemain berikut ambil 2x</p>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-emoji">⏭️</span>
+                            <div>
+                                <strong>Skip</strong>
+                                <p>Akhiri giliran tanpa ambil kartu</p>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-emoji">🎁</span>
+                            <div>
+                                <strong>Favor</strong>
+                                <p>Paksa pemain lain kasih 1 kartu</p>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-emoji">🔀</span>
+                            <div>
+                                <strong>Shuffle</strong>
+                                <p>Kocok ulang deck</p>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-emoji">🔮</span>
+                            <div>
+                                <strong>See Future</strong>
+                                <p>Lihat 3 kartu teratas deck</p>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-emoji">🚫</span>
+                            <div>
+                                <strong>Nope</strong>
+                                <p>Batalkan aksi pemain lain</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h4>🐱 Kartu Kucing (Cat Cards)</h4>
+                    <p class="cat-note">🌮🍈🥔🧔🌈</p>
+                    <p><strong>⚠️ Butuh 2 kartu kucing yang SAMA untuk dimainkan!</strong></p>
+                    <p>Mainkan 2 kartu kucing sama → Curi 1 kartu random dari pemain lain</p>
+                    
+                    <h4>💡 Tips</h4>
+                    <ul>
+                        <li>Simpan Defuse untuk darurat!</li>
+                        <li>Gunakan See Future sebelum ambil kartu</li>
+                        <li>Shuffle jika tahu bom di atas</li>
+                        <li>Nope bisa membatalkan Nope lain!</li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/cards.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/player.js"></script>
+    <script>
+        if (typeof firebase !== 'undefined') {
+            initFirebase();
+        }
+    </script>
+</body>
+</html>

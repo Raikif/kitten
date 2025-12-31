@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐱💣 Exploding Kittens</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container main-menu">
+        <div class="logo">
+            <h1>🐱💣</h1>
+            <h2>Exploding Kittens</h2>
+            <p>Permainan Kartu Multiplayer</p>
+        </div>
+        
+        <div class="menu-buttons">
+            <a href="host.html" class="btn btn-primary btn-large">
+                📺 Buat Room (Host)
+            </a>
+            <a href="player.html" class="btn btn-secondary btn-large">
+                🎮 Gabung Room
+            </a>
+        </div>
+        
+        <div class="info-box">
+            <h3>📋 Cara Bermain:</h3>
+            <ol>
+                <li>Host membuat room dan menampilkan di layar besar</li>
+                <li>Pemain lain scan QR atau masukkan kode</li>
+                <li>Host mulai game ketika 2-8 pemain siap</li>
+                <li>Jangan sampai meledak! 💥</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script>
+        if (typeof firebase !== 'undefined') {
+            initFirebase();
+        }
+    </script>
+</body>
+</html>
